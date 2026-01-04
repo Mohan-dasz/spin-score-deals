@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Sparkles, Gift, Percent, Zap, ShoppingBag } from 'lucide-react';
 import { LeadForm } from '@/components/LeadForm';
+import priyamLogo from '@/assets/priyam-organics-logo.png';
 
 const floatingIcons = [
   { icon: Gift, delay: 0, x: '5%', y: '25%' },
@@ -60,13 +61,11 @@ const Landing = () => {
           transition={{ duration: 0.5 }}
           className="flex justify-center mb-6 sm:mb-8 md:mb-10"
         >
-          {/* Logo placeholder - replace src with your actual logo */}
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl gradient-bg flex items-center justify-center glow-effect">
-              <Gift className="w-6 h-6 sm:w-7 sm:h-7 text-primary-foreground" />
-            </div>
-            <span className="text-xl sm:text-2xl font-bold gradient-text">SpinToWin</span>
-          </div>
+          <img 
+            src={priyamLogo} 
+            alt="Priyam Organics - Taste Meets Tradition" 
+            className="h-16 sm:h-20 md:h-24 w-auto object-contain"
+          />
         </motion.div>
 
         <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-16 xl:gap-20">
