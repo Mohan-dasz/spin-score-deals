@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Phone, User, ArrowRight, Gift } from 'lucide-react';
+import { Phone, User, Mail, ArrowRight, Gift } from 'lucide-react';
 import { useLeadStore } from '@/store/leadStore';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,10 @@ const leadSchema = z.object({
     .trim()
     .min(2, 'Name must be at least 2 characters')
     .max(100, 'Name must be less than 100 characters'),
+  email: z.string()
+    .trim()
+    .email('Please enter a valid email address')
+    .max(255, 'Email must be less than 255 characters'),
   whatsappNumber: z.string()
     .trim()
     .min(10, 'Please enter a valid WhatsApp number')
@@ -35,6 +39,7 @@ export const LeadForm = () => {
     resolver: zodResolver(leadSchema),
     defaultValues: {
       name: '',
+      email: '',
       whatsappNumber: '',
     },
   });
@@ -73,6 +78,7 @@ export const LeadForm = () => {
       // Set new lead data
       setLead({
         name: data.name,
+        email: data.email,
         whatsappNumber: normalizedNumber,
         submittedAt: new Date(),
       });
@@ -99,32 +105,32 @@ export const LeadForm = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-md"
+      className="w-full"
     >
-      <div className="card-elevated p-8 backdrop-blur-sm">
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-bg mb-4 glow-effect">
-            <Gift className="w-8 h-8 text-primary-foreground" />
+      <div className="card-elevated p-6 sm:p-8 backdrop-blur-sm">
+        <div className="text-center mb-5 sm:mb-6">
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full gradient-bg mb-3 sm:mb-4 glow-effect">
+            <Gift className="w-7 h-7 sm:w-8 sm:h-8 text-primary-foreground" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Unlock Your Offer</h2>
-          <p className="text-muted-foreground">Enter your details to spin the wheel and win exclusive deals!</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">Unlock Your Offer</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">Enter your details to spin the wheel and win exclusive deals!</p>
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground">Your Name</FormLabel>
+                  <FormLabel className="text-foreground text-sm">Your Name</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                       <Input
                         {...field}
                         placeholder="John Doe"
-                        className="pl-10 h-12 bg-background border-input focus:border-primary focus:ring-primary"
+                        className="pl-10 h-11 sm:h-12 bg-background border-input focus:border-primary focus:ring-primary text-base"
                         aria-describedby="name-error"
                       />
                     </div>
@@ -136,18 +142,41 @@ export const LeadForm = () => {
 
             <FormField
               control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-foreground text-sm">Email Address</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder="john@example.com"
+                        className="pl-10 h-11 sm:h-12 bg-background border-input focus:border-primary focus:ring-primary text-base"
+                        aria-describedby="email-error"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage id="email-error" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="whatsappNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground">WhatsApp Number</FormLabel>
+                  <FormLabel className="text-foreground text-sm">WhatsApp Number</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                       <Input
                         {...field}
                         type="tel"
                         placeholder="+91 98765 43210"
-                        className="pl-10 h-12 bg-background border-input focus:border-primary focus:ring-primary"
+                        className="pl-10 h-11 sm:h-12 bg-background border-input focus:border-primary focus:ring-primary text-base"
                         aria-describedby="whatsapp-error"
                       />
                     </div>
@@ -160,7 +189,7 @@ export const LeadForm = () => {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-12 gradient-bg text-primary-foreground font-semibold text-lg hover:opacity-90 transition-all glow-effect"
+              className="w-full h-11 sm:h-12 gradient-bg text-primary-foreground font-semibold text-base sm:text-lg hover:opacity-90 transition-all glow-effect mt-2"
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
