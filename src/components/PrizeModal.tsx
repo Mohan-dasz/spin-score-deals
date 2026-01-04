@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Copy, Check, Sparkles } from 'lucide-react';
+import { X, Copy, Check, Sparkles, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
-import { Prize } from '@/store/leadStore';
+import { Prize, useLeadStore } from '@/store/leadStore';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 
@@ -13,18 +13,19 @@ interface PrizeModalProps {
 
 export const PrizeModal = ({ prize, isOpen, onClose }: PrizeModalProps) => {
   const [copied, setCopied] = useState(false);
+  const { couponCode } = useLeadStore();
 
   if (!prize) return null;
 
-  const promoCode = `SPIN${prize.discount.replace(/[^0-9]/g, '') || 'SHIP'}${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-
   const handleCopy = async () => {
+    if (!couponCode) return;
+    
     try {
-      await navigator.clipboard.writeText(promoCode);
+      await navigator.clipboard.writeText(couponCode);
       setCopied(true);
       toast({
         title: "Copied! 📋",
-        description: "Your promo code has been copied to clipboard",
+        description: "Your coupon code has been copied to clipboard",
       });
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -107,7 +108,7 @@ export const PrizeModal = ({ prize, isOpen, onClose }: PrizeModalProps) => {
                 transition={{ delay: 0.4 }}
                 className="text-primary-foreground/90 text-lg"
               >
-                You've won an amazing prize!
+                You've won an exclusive offer!
               </motion.p>
             </div>
 
@@ -123,43 +124,47 @@ export const PrizeModal = ({ prize, isOpen, onClose }: PrizeModalProps) => {
                   <span className="text-4xl font-bold gradient-text">{prize.discount}</span>
                 </motion.div>
                 <p className="text-muted-foreground">
-                  Use this exclusive discount on your next purchase!
+                  Use this exclusive offer on your next purchase!
                 </p>
               </div>
 
-              {/* Promo Code */}
-              <div className="bg-muted rounded-xl p-4 mb-6">
-                <p className="text-sm text-muted-foreground mb-2 text-center">Your Promo Code</p>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-background rounded-lg px-4 py-3 font-mono font-bold text-lg text-center text-foreground border-2 border-dashed border-primary/30">
-                    {promoCode}
+              {/* Coupon Code */}
+              {couponCode && (
+                <div className="bg-muted rounded-xl p-4 mb-6">
+                  <p className="text-sm text-muted-foreground mb-2 text-center">Your Coupon Code</p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 bg-background rounded-lg px-4 py-3 font-mono font-bold text-lg text-center text-foreground border-2 border-dashed border-primary/30">
+                      {couponCode}
+                    </div>
+                    <Button
+                      onClick={handleCopy}
+                      variant="outline"
+                      size="icon"
+                      className="h-12 w-12 shrink-0"
+                      aria-label="Copy coupon code"
+                    >
+                      {copied ? (
+                        <Check className="w-5 h-5 text-green-500" />
+                      ) : (
+                        <Copy className="w-5 h-5" />
+                      )}
+                    </Button>
                   </div>
-                  <Button
-                    onClick={handleCopy}
-                    variant="outline"
-                    size="icon"
-                    className="h-12 w-12 shrink-0"
-                    aria-label="Copy promo code"
-                  >
-                    {copied ? (
-                      <Check className="w-5 h-5 text-success" />
-                    ) : (
-                      <Copy className="w-5 h-5" />
-                    )}
-                  </Button>
                 </div>
-              </div>
+              )}
 
               {/* CTA */}
               <Button
                 onClick={onClose}
-                className="w-full h-12 gradient-bg text-primary-foreground font-semibold text-lg hover:opacity-90 transition-all"
+                className="w-full h-12 font-semibold text-lg"
+                style={{ backgroundColor: prize.color }}
               >
-                Start Shopping 🛒
+                <ShoppingBag className="w-5 h-5 mr-2" />
+                Redeem Now
               </Button>
 
               <p className="text-xs text-muted-foreground text-center mt-4">
-                Valid for 7 days. Cannot be combined with other offers.
+                This offer is non-transferable and single-use only.
               </p>
             </div>
           </motion.div>

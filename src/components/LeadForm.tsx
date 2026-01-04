@@ -4,8 +4,9 @@ import { motion } from 'framer-motion';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Mail, User, ArrowRight, Gift } from 'lucide-react';
+import { Phone, User, ArrowRight, Gift } from 'lucide-react';
 import { useLeadStore } from '@/store/leadStore';
+import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -16,46 +17,81 @@ const leadSchema = z.object({
     .trim()
     .min(2, 'Name must be at least 2 characters')
     .max(100, 'Name must be less than 100 characters'),
-  email: z.string()
+  whatsappNumber: z.string()
     .trim()
-    .email('Please enter a valid email address')
-    .max(255, 'Email must be less than 255 characters'),
+    .min(10, 'Please enter a valid WhatsApp number')
+    .max(15, 'WhatsApp number is too long')
+    .regex(/^[0-9+\-\s]+$/, 'Please enter a valid phone number'),
 });
 
 type LeadFormData = z.infer<typeof leadSchema>;
 
 export const LeadForm = () => {
   const navigate = useNavigate();
-  const { setLead } = useLeadStore();
+  const { setLead, reset } = useLeadStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<LeadFormData>({
     resolver: zodResolver(leadSchema),
     defaultValues: {
       name: '',
-      email: '',
+      whatsappNumber: '',
     },
   });
 
   const onSubmit = async (data: LeadFormData) => {
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    setLead({
-      name: data.name,
-      email: data.email,
-      submittedAt: new Date(),
-    });
-    
-    toast({
-      title: "You're in! 🎉",
-      description: "Get ready to spin the wheel and win amazing discounts!",
-    });
-    
-    setIsSubmitting(false);
-    navigate('/spin-wheel');
+    try {
+      // Normalize WhatsApp number (remove spaces and dashes)
+      const normalizedNumber = data.whatsappNumber.replace(/[\s\-]/g, '');
+      
+      // Check if this WhatsApp number has already spun
+      const { data: existingLead, error: checkError } = await supabase
+        .from('leads')
+        .select('id, offer_label')
+        .eq('whatsapp_number', normalizedNumber)
+        .maybeSingle();
+
+      if (checkError) {
+        throw new Error('Failed to verify your number. Please try again.');
+      }
+
+      if (existingLead) {
+        toast({
+          title: "Already Participated! 🎯",
+          description: `This WhatsApp number has already won: ${existingLead.offer_label}`,
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Reset any previous state
+      reset();
+      
+      // Set new lead data
+      setLead({
+        name: data.name,
+        whatsappNumber: normalizedNumber,
+        submittedAt: new Date(),
+      });
+      
+      toast({
+        title: "You're in! 🎉",
+        description: "Get ready to spin the wheel and win amazing offers!",
+      });
+      
+      navigate('/spin-wheel');
+    } catch (error) {
+      toast({
+        title: "Oops!",
+        description: error instanceof Error ? error.message : "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -70,8 +106,8 @@ export const LeadForm = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-bg mb-4 glow-effect">
             <Gift className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Unlock Your Discount</h2>
-          <p className="text-muted-foreground">Enter your details to spin the wheel and win exclusive offers!</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Unlock Your Offer</h2>
+          <p className="text-muted-foreground">Enter your details to spin the wheel and win exclusive deals!</p>
         </div>
 
         <Form {...form}>
@@ -100,23 +136,23 @@ export const LeadForm = () => {
 
             <FormField
               control={form.control}
-              name="email"
+              name="whatsappNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground">Email Address</FormLabel>
+                  <FormLabel className="text-foreground">WhatsApp Number</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                       <Input
                         {...field}
-                        type="email"
-                        placeholder="john@example.com"
+                        type="tel"
+                        placeholder="+91 98765 43210"
                         className="pl-10 h-12 bg-background border-input focus:border-primary focus:ring-primary"
-                        aria-describedby="email-error"
+                        aria-describedby="whatsapp-error"
                       />
                     </div>
                   </FormControl>
-                  <FormMessage id="email-error" />
+                  <FormMessage id="whatsapp-error" />
                 </FormItem>
               )}
             />
@@ -129,7 +165,7 @@ export const LeadForm = () => {
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <span className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  Processing...
+                  Verifying...
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
@@ -142,7 +178,7 @@ export const LeadForm = () => {
         </Form>
 
         <p className="text-xs text-muted-foreground text-center mt-4">
-          By submitting, you agree to receive promotional emails. Unsubscribe anytime.
+          One spin per WhatsApp number. By participating, you agree to our terms.
         </p>
       </div>
     </motion.div>

@@ -14,7 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      leads: {
+        Row: {
+          coupon_code: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_redeemed: boolean | null
+          name: string
+          offer_discount: string
+          offer_id: string
+          offer_label: string
+          redeemed_at: string | null
+          whatsapp_number: string
+        }
+        Insert: {
+          coupon_code?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_redeemed?: boolean | null
+          name: string
+          offer_discount: string
+          offer_id: string
+          offer_label: string
+          redeemed_at?: string | null
+          whatsapp_number: string
+        }
+        Update: {
+          coupon_code?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_redeemed?: boolean | null
+          name?: string
+          offer_discount?: string
+          offer_id?: string
+          offer_label?: string
+          redeemed_at?: string | null
+          whatsapp_number?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
