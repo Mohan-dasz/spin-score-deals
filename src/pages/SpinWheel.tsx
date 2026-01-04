@@ -6,7 +6,6 @@ import { SpinWheel } from '@/components/SpinWheel';
 import { PrizeModal } from '@/components/PrizeModal';
 import { Prize, useLeadStore } from '@/store/leadStore';
 import { Button } from '@/components/ui/button';
-import foxMascot from '@/assets/fox-mascot.png';
 import priyamLogo from '@/assets/priyam-organics-logo.png';
 
 const SpinWheelPage = () => {
@@ -69,7 +68,7 @@ const SpinWheelPage = () => {
           <img 
             src={priyamLogo} 
             alt="Priyam Organics" 
-            className="h-10 sm:h-12 w-auto object-contain"
+            className="h-14 sm:h-16 md:h-20 w-auto object-contain"
           />
           
           <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
@@ -113,59 +112,13 @@ const SpinWheelPage = () => {
           </p>
         </motion.div>
 
-        {/* Wheel with Fox Mascot */}
+        {/* Wheel */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
-          className="flex justify-center items-center relative"
+          className="flex justify-center"
         >
-          {/* Fox mascot - left side on desktop, top on mobile */}
-          <motion.div
-            initial={{ x: -100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.6, type: 'spring' }}
-            className="hidden lg:block absolute -left-8 xl:-left-16 top-1/2 -translate-y-1/2 z-20"
-          >
-            <motion.img
-              src={foxMascot}
-              alt="Fox Mascot"
-              className="w-36 xl:w-44 h-auto drop-shadow-2xl"
-              animate={{ 
-                y: [0, -10, 0],
-                rotate: [0, 3, 0, -3, 0]
-              }}
-              transition={{ 
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-          </motion.div>
-
-          {/* Mobile fox mascot */}
-          <motion.div
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="lg:hidden absolute -top-4 right-4 sm:right-8 z-20"
-          >
-            <motion.img
-              src={foxMascot}
-              alt="Fox Mascot"
-              className="w-20 sm:w-24 h-auto drop-shadow-xl"
-              animate={{ 
-                y: [0, -5, 0],
-                rotate: [0, 5, 0]
-              }}
-              transition={{ 
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-          </motion.div>
-
           <SpinWheel onSpinComplete={handleSpinComplete} />
         </motion.div>
 
