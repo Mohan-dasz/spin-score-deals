@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Copy, Check, Sparkles, ShoppingBag } from 'lucide-react';
+import { X, Copy, Check, Sparkles, Instagram } from 'lucide-react';
 import { useState } from 'react';
 import { Prize, useLeadStore } from '@/store/leadStore';
 import { Button } from '@/components/ui/button';
@@ -153,18 +153,23 @@ export const PrizeModal = ({ prize, isOpen, onClose }: PrizeModalProps) => {
                 </div>
               )}
 
-              {/* CTA */}
+              {/* CTA - Redeem on Instagram */}
               <Button
-                onClick={onClose}
-                className="w-full h-12 font-semibold text-lg"
-                style={{ backgroundColor: prize.color }}
+                asChild
+                className="w-full h-14 font-semibold text-lg bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-90 transition-opacity text-white border-0"
               >
-                <ShoppingBag className="w-5 h-5 mr-2" />
-                Redeem Now
+                <a 
+                  href="https://www.instagram.com/milletfoods_priyamorganics?utm_source=qr&igsh=anZvbmg2ZmtodnQ4"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Instagram className="w-5 h-5 mr-2" />
+                  Redeem Offer on Instagram
+                </a>
               </Button>
 
               <p className="text-xs text-muted-foreground text-center mt-4">
-                This offer is non-transferable and single-use only.
+                Follow us on Instagram to redeem your offer. This offer is non-transferable and single-use only.
               </p>
             </div>
           </motion.div>
