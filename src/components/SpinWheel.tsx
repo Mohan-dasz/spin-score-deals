@@ -87,6 +87,31 @@ export const SpinWheel = ({ onSpinComplete }: SpinWheelProps) => {
     if (isSpinning || hasSpun || !lead) return;
 
     setIsSpinning(true);
+
+    // Check if WhatsApp number already exists in database
+    try {
+      const { data: existingLead, error: checkError } = await supabase
+        .from('leads')
+        .select('id, coupon_code, offer_label')
+        .eq('whatsapp_number', lead.whatsappNumber)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('Error checking existing lead:', checkError);
+      }
+
+      if (existingLead) {
+        setIsSpinning(false);
+        toast({
+          title: "Already Participated",
+          description: `This WhatsApp number has already been used. Your previous offer: ${existingLead.offer_label}`,
+          variant: "destructive",
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking existing lead:', error);
+    }
     
     // Select prize using probability logic
     const selectedPrize = selectPrizeByProbability();
