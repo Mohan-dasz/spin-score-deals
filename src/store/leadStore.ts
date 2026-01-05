@@ -60,10 +60,10 @@ export const prizes: Prize[] = [
 ];
 
 /**
- * Selects a prize based on weighted probability logic:
+ * Selects a prize based on weighted probability logic (Day 2):
  * - 1-20 → 50% OFF (20% chance)
- * - 21-40 → 75% OFF (20% chance)
- * - 41-100 → Buy @ ₹9 (60% chance)
+ * - 21-55 → 75% OFF (35% chance)
+ * - 56-100 → Buy @ ₹9 (45% chance)
  * - 30% OFF is fallback only (0% normal chance)
  */
 export const selectPrizeByProbability = (): Prize => {
@@ -73,11 +73,11 @@ export const selectPrizeByProbability = (): Prize => {
     if (random >= 1 && random <= 20) {
       // 20% chance - 50% OFF
       return prizes.find(p => p.id === '2')!;
-    } else if (random >= 21 && random <= 40) {
-      // 20% chance - 75% OFF
+    } else if (random >= 21 && random <= 55) {
+      // 35% chance - 75% OFF
       return prizes.find(p => p.id === '3')!;
     } else {
-      // 60% chance (41-100) - Buy @ ₹9
+      // 45% chance (56-100) - Buy @ ₹9
       return prizes.find(p => p.id === '4')!;
     }
   } catch {
